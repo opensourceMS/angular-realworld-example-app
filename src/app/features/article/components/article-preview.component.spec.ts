@@ -1,8 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { of } from 'rxjs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ArticlesService } from '../services/articles.service';
+import { UserService } from '../../../core/auth/services/user.service';
 import { Article } from '../models/article.model';
-import { FavoriteButtonComponent } from './favorite-button.component';
 import { ArticlePreviewComponent } from './article-preview.component';
 
 describe('ArticlePreviewComponent', () => {
@@ -24,7 +26,11 @@ describe('ArticlePreviewComponent', () => {
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [ArticlePreviewComponent],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        { provide: ArticlesService, useValue: { get: vi.fn(), favorite: vi.fn(), unfavorite: vi.fn() } },
+        { provide: UserService, useValue: { currentUser: of(null), isAuthenticated: of(false) } },
+      ],
     }).compileComponents();
     fixture = TestBed.createComponent(ArticlePreviewComponent);
   });
@@ -48,13 +54,29 @@ describe('ArticlePreviewComponent', () => {
     expect(host.querySelector('.reading-time')?.textContent?.trim()).toBe(expected);
   });
 
-  it('should preserve preview content, navigation, favorite projection, and avoid body-fetch calls', () => {
-    const host = render(article('preview body'));
+  it('should preserve preview metadata and issue no body fetch across input updates', () => {
+    const articles = TestBed.inject(ArticlesService);
+    const host = render(article());
 
     expect(host.querySelector('h1')?.textContent?.trim()).toBe('Test Article');
     expect(host.querySelector('.preview-link p')?.textContent?.trim()).toBe('A description');
     expect(host.querySelector('.author')?.textContent?.trim()).toBe('reader');
+    expect(host.querySelector('.author')?.getAttribute('href')).toBe('/profile/reader');
+    expect(host.querySelector('.date')?.textContent?.trim()).toBe('January 1, 2024');
+    expect(host.querySelector('.article-meta img')?.getAttribute('src')).toBe('/assets/default-avatar.svg');
     expect(host.querySelector('.preview-link')?.getAttribute('href')).toContain('/article/test-article');
     expect(host.querySelector('app-favorite-button')).toBeTruthy();
+
+    expect(host.querySelector('.reading-time')).toBeNull();
+    expect(articles.get).not.toHaveBeenCalled();
+    fixture.componentRef.setInput('articleInput', article('preview body'));
+    fixture.detectChanges();
+    expect(host.querySelector('.reading-time')?.textContent?.trim()).toBe('1 min read');
+    fixture.detectChanges();
+    expect(articles.get).not.toHaveBeenCalled();
+    fixture.componentRef.setInput('articleInput', article());
+    fixture.detectChanges();
+    expect(host.querySelector('.reading-time')).toBeNull();
+    expect(articles.get).not.toHaveBeenCalled();
   });
 });

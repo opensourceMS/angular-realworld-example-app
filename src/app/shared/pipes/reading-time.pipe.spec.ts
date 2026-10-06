@@ -27,6 +27,17 @@ describe('readingTime', () => {
   });
 
   it.each([
+    ['literal identifier', 'snake_case'],
+    ['inline-code identifier', `${ticks}snake_case${ticks}`],
+    ['intraword emphasis', 'pre**fix**'],
+  ])('should keep %s as one word at the reading-time boundary', (_label, finalWord) => {
+    const body = `${words(199)} ${finalWord}`;
+    expect(body.trim().split(/\s+/)).toHaveLength(200);
+    expect(readingTime(body)).toBe(1);
+    expect(readingTime(`${body} extra`)).toBe(2);
+  });
+
+  it.each([
     ['fenced code', words(198) + '\n' + codeFence, 1],
     ['inline code', words(198) + ' ' + ticks + 'alpha beta' + ticks, 1],
     [
@@ -79,7 +90,7 @@ describe('ReadingTimePipe', () => {
 });
 
 describe('readingTime performance', () => {
-  it('should measure 100 warmed 10,000-word calculations below five milliseconds each', () => {
+  it('should report diagnostic timings for 100 warmed 10,000-word calculations', () => {
     const body = words(10000);
     expect(readingTime(body)).toBe(50);
     for (let warmup = 0; warmup < 10; warmup++) readingTime(body);
@@ -87,8 +98,9 @@ describe('readingTime performance', () => {
     const durations: number[] = [];
     for (let sample = 0; sample < 100; sample++) {
       const start = performance.now();
-      expect(readingTime(body)).toBe(50);
+      const minutes = readingTime(body);
       durations.push(performance.now() - start);
+      expect(minutes).toBe(50);
     }
 
     const sorted = [...durations].sort((a, b) => a - b);
@@ -96,7 +108,7 @@ describe('readingTime performance', () => {
     const median = sorted[Math.floor(sorted.length / 2)];
     const maximum = sorted[sorted.length - 1];
     console.info(
-      `readingTime 10k-word timing: runtime=${process.version}; platform=${process.platform}/${process.arch}; samples=${durations.length}; under5ms=${underThreshold}; median=${median.toFixed(4)}ms; max=${maximum.toFixed(4)}ms; samplesMs=${durations.map(value => value.toFixed(4)).join(',')}`,
+      `readingTime 10k-word diagnostic timing (not an NFR-1 acceptance gate): runtime=${process.version}; platform=${process.platform}/${process.arch}; samples=${durations.length}; under5ms=${underThreshold}; median=${median.toFixed(4)}ms; max=${maximum.toFixed(4)}ms; samplesMs=${durations.map(value => value.toFixed(4)).join(',')}`,
     );
   });
 });

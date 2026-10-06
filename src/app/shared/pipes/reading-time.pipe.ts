@@ -8,7 +8,7 @@ export function readingTime(body: string): number {
     .replace(/<[^>]*>/g, ' ')
     .replace(/^\s{0,3}(?:#{1,6}\s*|>\s*|[-+*]\s+|\d+\.\s+)/gm, ' ')
     .replace(/`+/g, '')
-    .replace(/[ *_~]/g, ' ');
+    .replace(/[*_~]/g, '');
 
   const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
   return Math.max(1, Math.ceil(wordCount / 200));

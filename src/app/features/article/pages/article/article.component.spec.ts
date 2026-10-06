@@ -9,6 +9,8 @@ import { CommentsService } from '../../services/comments.service';
 import ArticleComponent from './article.component';
 
 describe('ArticleComponent', () => {
+  const words = (count: number) => Array(count).fill('word').join(' ');
+
   const article = (body?: string): Article => ({
     slug: 'test-article',
     title: 'Test Article',
@@ -52,6 +54,7 @@ describe('ArticleComponent', () => {
 
   it('should show the same reading time in both page meta blocks', async () => {
     const host = await render(article(Array(401).fill('word').join(' ')));
+    await vi.waitFor(() => expect(host.querySelector('.article-content div')?.textContent?.trim()).toBe(words(401)));
     const banner = host.querySelectorAll('.banner app-article-meta .reading-time');
     const actions = host.querySelectorAll('.article-actions app-article-meta .reading-time');
 
@@ -61,7 +64,19 @@ describe('ArticleComponent', () => {
     expect(actions[0].textContent?.trim()).toBe('3 min read');
     expect(banner[0].previousElementSibling?.classList.contains('date')).toBe(true);
     expect(actions[0].previousElementSibling?.classList.contains('date')).toBe(true);
-    expect(host.querySelector('.article-content')).toBeTruthy();
+    expect(host.querySelector('.article-content div')?.textContent?.trim()).toBe(words(401));
+    expect(host.querySelectorAll('.article-meta .author')).toHaveLength(2);
+    expect(
+      Array.from(host.querySelectorAll('.article-meta .author')).map(element => element.textContent?.trim()),
+    ).toEqual(['reader', 'reader']);
+    expect(
+      Array.from(host.querySelectorAll('.article-meta .author')).map(element => element.getAttribute('href')),
+    ).toEqual(['/profile/reader', '/profile/reader']);
+    expect(
+      Array.from(host.querySelectorAll('.article-meta .date')).map(element => element.textContent?.trim()),
+    ).toEqual(['January 1, 2024', 'January 1, 2024']);
+    expect(host.querySelectorAll('.article-meta img[src="/assets/default-avatar.svg"]')).toHaveLength(2);
+    expect(host.querySelectorAll('.article-meta app-favorite-button')).toHaveLength(2);
   });
 
   it('should show one minute for an empty body in both meta blocks', async () => {
@@ -77,5 +92,6 @@ describe('ArticleComponent', () => {
     const host = await render(article());
     expect(host.querySelectorAll('.reading-time')).toHaveLength(0);
     expect(host.querySelector('.article-content div')?.textContent?.trim()).toBe('');
+    expect(host.querySelectorAll('.article-meta app-favorite-button')).toHaveLength(2);
   });
 });
