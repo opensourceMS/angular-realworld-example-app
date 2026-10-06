@@ -9,10 +9,10 @@ phases:
   delivery_planning: { started: "2026-10-06T13:18:02Z", completed: "2026-10-06T13:22:08Z" }
   delivery: { started: "2026-10-06T13:22:08Z", completed: "2026-10-06T14:08:51Z" }
   system_spec_update: { started: "2026-10-06T14:08:51Z", completed: "2026-10-06T15:09:49Z" }
-  review_fix: { started: "2026-10-06T15:09:49Z", completed: null }
-  quality_gates: { started: null, completed: null }
-  dod_check: { started: null, completed: null }
-  pr_creation: { started: null, completed: null, url: null }
+  review_fix: { started: "2026-10-06T15:09:49Z", completed: "2026-10-06T15:26:27Z" }
+  quality_gates: { started: "2026-10-06T15:26:27Z", completed: "2026-10-06T15:30:11Z" }
+  dod_check: { started: "2026-10-06T15:30:11Z", completed: "2026-10-06T15:30:11Z" }
+  pr_creation: { started: "2026-10-06T15:30:11Z", completed: null, url: null }
 decisions:
   - text: >-
       PM-decided (user asked to run full workflow without waiting): option D. Reading time is
@@ -44,6 +44,13 @@ decisions:
     date: "2026-10-06"
   - text: "System docs: @doc-syncer found no system spec to reconcile (.samourai/docai/spec absent); no update required."
     date: "2026-10-06"
+  - text: "Review iteration 1 FAIL (1 major: snake_case/intraword `_` split words; 2 minor: perf timing included assertions, missing page/preview assertions) -> remediated in eb2f9a7 -> iteration 2 PASS, 0 findings."
+    date: "2026-10-06"
+  - text: >-
+      Quality gates: `bunx vitest run` 11 files / 231 tests PASS; `bun run build` PASS; `format:check` only flagged
+      uncommitted reviewer edit of chg-GH-1-plan.md (formatted by lint-staged on commit); realworld submodule pointer unchanged.
+      DoD: 31/31 plan tasks checked, phases 1-7 completed, AC1-AC5 satisfied, AC6 satisfied for unit/build with E2E residual gap accepted by user.
+    date: "2026-10-06"
 open_questions: []
 blockers:
   - text: "Waiting for product owner decision on preview behavior"
@@ -73,6 +80,9 @@ notes:
     type: retro
     date: "2026-10-06"
   - text: "E2E env debugging (port 4200 held by unresponsive user dev server, IPv6 localhost probe, 4300 timeout) consumed ~1h across 3 delegations before user dropped it. Next time: ask user upfront to stop their dev server or accept E2E gap early."
+    type: retro
+    date: "2026-10-06"
+  - text: "Reviewer caught a real AC1 bug (intraword `_` splitting words) missed by the TDD tests in delivery: Markdown fixtures only covered delimiter-wrapped emphasis, not identifiers. Test plan should include 'non-syntax punctuation inside words' cases."
     type: retro
     date: "2026-10-06"
   - text: "Blocking question was resolved by PM decision after user requested end-to-end run; decision logged on ticket"

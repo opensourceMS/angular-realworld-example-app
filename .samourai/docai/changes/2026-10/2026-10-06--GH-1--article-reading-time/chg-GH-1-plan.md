@@ -242,8 +242,8 @@ it('should exclude heading syntax at the rounding boundary', () => {
 **Tasks**:
 
 - [x] **5.1** Update the change test plan to reference this plan and actual function/spec location, reflect TC-READTIME-012 as N/A per PM notes throughout its scenario tables/open questions/log, and remove the obsolete local-E2E tooling assumption. Preserve failed/blocked evidence and remaining non-blocking counting clarifications. Document current list-preview behavior and unchanged endpoints; do not create a new system specification solely for this change. (Plan/test-plan links and actual files reconciled; 012 N/A and 5.1 scope limited to change artifacts, per user directive.)
-- [ ] **5.2** Perform Code Review (Analysis) against F-1–F-4, all six ACs, NFR-1–3, and RSK-1–4. Inspect Markdown boundary oracles, purity, optional-body consumers, template sibling placement, OnPush transitions, page composition, unchanged HTTP contracts, and read-only submodule/debug compatibility. Record findings and criterion coverage in this plan's execution log. (Reviewer agent dispatch unavailable in this runtime due subagent-depth limit. Local inspection was done, but no independent reviewer PASS is available; remains open.)
-- [ ] **5.3** If findings require fixes, first add a failing focused regression test for each behavioral defect, run it red, implement the minimal fix, then rerun affected tests and review until PASS. Record findings, tests, and disposition; if none, record post-review fixes as Not required. Escalate an actual architectural departure as **Decision needed: consult `@architect`**, recording an ADR link before implementing that departure.
+- [x] **5.2** Perform Code Review (Analysis) against F-1–F-4, all six ACs, NFR-1–3, and RSK-1–4. Inspect Markdown boundary oracles, purity, optional-body consumers, template sibling placement, OnPush transitions, page composition, unchanged HTTP contracts, and read-only submodule/debug compatibility. Record findings and criterion coverage in this plan's execution log. (Independent review iteration 2: PASS on 2026-10-06; all three iteration-1 findings resolved. See `code-review/review-iter-2.md`.)
+- [x] **5.3** If findings require fixes, first add a failing focused regression test for each behavioral defect, run it red, implement the minimal fix, then rerun affected tests and review until PASS. Record findings, tests, and disposition; if none, record post-review fixes as Not required. Escalate an actual architectural departure as **Decision needed: consult `@architect`**, recording an ADR link before implementing that departure. (Phase 7 remediation in `eb2f9a7`, documentation in `729a675`; regression evidence recorded below and independently re-reviewed PASS. No architecture departure.)
 - [x] **5.4** Recheck artifact consistency and run focused affected specs plus formatting checks for changed documents; checkpoint reconciled documentation and any demonstrated fixes. Do not claim performance/E2E success before Phase 6 evidence exists. (Focused feature/UI test group 44 passed, editor 2/2, service 16/16; `bun run format` and `bun run format:check` passed. Review task remains open.)
 
 **Acceptance Criteria**:
@@ -350,20 +350,21 @@ No ADR is required by the specified local function/pipe design. A departure requ
 | ------- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1.0     | 2026-10-06 | plan-writer | Initial six-phase TDD-oriented plan from canonical spec/template, test strategy, and PM decisions; includes optional-body Markdown fallout, preservation/integration coverage, TC-READTIME-012 N/A, review/fix loop, minor release handling, and explicit final-gate fallback. |
 | 1.1     | 2026-10-06 | reviewer    | First independent review: append Phase 7 for three findings (one major, two minor); preserve PM dispositions and all existing task states. No source modifications or commit.                                                                                                  |
+| 1.2     | 2026-10-06 | reviewer    | Review iteration 2 PASS: close Phase 7 and review/fix tasks 5.2/5.3; record independent verification and resolved findings. No new remediation, source modifications, or commit.                                                                                               |
 
 ## Execution Log
 
 Planning only. No implementation, tests, quality gates, branch operation, or commit was performed by the plan writer. Repository permissions prohibit this role from executing commands/committing; the authorized executor owns those operations. Only this plan file is written. No runtime/performance/E2E pass is implied by this document.
 
-| Phase | Status      | Started    | Completed  | Commit  | Notes                                                                      |
-| ----- | ----------- | ---------- | ---------- | ------- | -------------------------------------------------------------------------- |
-| 1     | Completed   | 2026-10-06 | 2026-10-06 | 924e1d7 | Pure function and pipe; 29 tests passed                                    |
-| 2     | Completed   | 2026-10-06 | 2026-10-06 | a1ec8ad | Optional-body model; page/editor fallbacks and tests                       |
-| 3     | Completed   | 2026-10-06 | 2026-10-06 | 11a6909 | Conditional date-adjacent meta display                                     |
-| 4     | Completed   | 2026-10-06 | 2026-10-06 | 2f98347 | Preview/page integration and request preservation tests                    |
-| 5     | Completed   | 2026-10-06 | 2026-10-06 | 2ad076a | Docs reconciled; review findings handled in Phase 7                        |
-| 6     | Completed   | 2026-10-06 | 2026-10-06 | TBD     | Version skipped; E2E residual accepted; final gates pass                   |
-| 7     | In progress | 2026-10-06 | —          | —       | Findings/tests/gates complete; phase commit pending committer availability |
+| Phase | Status    | Started    | Completed  | Commit            | Notes                                                                |
+| ----- | --------- | ---------- | ---------- | ----------------- | -------------------------------------------------------------------- |
+| 1     | Completed | 2026-10-06 | 2026-10-06 | 924e1d7           | Pure function and pipe; 29 tests passed                              |
+| 2     | Completed | 2026-10-06 | 2026-10-06 | a1ec8ad           | Optional-body model; page/editor fallbacks and tests                 |
+| 3     | Completed | 2026-10-06 | 2026-10-06 | 11a6909           | Conditional date-adjacent meta display                               |
+| 4     | Completed | 2026-10-06 | 2026-10-06 | 2f98347           | Preview/page integration and request preservation tests              |
+| 5     | Completed | 2026-10-06 | 2026-10-06 | 2ad076a           | Docs reconciled; review findings handled in Phase 7                  |
+| 6     | Completed | 2026-10-06 | 2026-10-06 | TBD               | Version skipped; E2E residual accepted; final gates pass             |
+| 7     | Completed | 2026-10-06 | 2026-10-06 | eb2f9a7 / 729a675 | All three findings independently verified resolved; iteration 2 PASS |
 
 Execution notes: Repository profile absent. Architecture consultation tool could not dispatch due platform subagent-depth limit; source inspection found no architectural departure or ADR requirement. UI consultation tool had the same limit; no styling/system changes were planned, and the sibling in `.info` follows existing metadata hierarchy. Current in-flight work crosses phase commits because integration/release verification exposed the existing duplicate Angular TestBed initialization in five legacy service specs; those specs were adjusted to use configured `src/test-setup.ts` to unblock the explicit full-suite gate. All other unrelated untracked/user modifications remain unstaged.
 
@@ -378,7 +379,7 @@ Execution notes: Repository profile absent. Architecture consultation tool could
 - NFR-1 — PARTIAL/noisy: one focused benchmark passed 100/100 under threshold (max 4.0493 ms); an additional attempt during suite load had a 5.1604 ms outlier (99/100 under). Repeat on a representative idle machine if required.
 - NFR-2 — PASSED: determinism tests and pure local implementation.
 - NFR-3 — PASSED in controlled component/service tests and partial browser Network observations; no list-body or repeated-meta detail fetch observed.
-- Review iteration 1 findings remediated with regression evidence and affected tests; no independent iteration-2 review agent available in the current runtime.
+- Review iteration 2 — PASS: all three iteration-1 findings independently verified resolved; no new findings. See `code-review/review-iter-2.md`.
 
 ### Phase 7: Code Review Remediation (Iteration 1)
 
@@ -405,4 +406,15 @@ Execution notes: Repository profile absent. Architecture consultation tool could
 - Architecture consultation was attempted but dispatch was unavailable due platform subagent-depth limit. No architecture departure was required; no ADR needed.
 - User dispositions: 6.4/6.6/6.7 closed with E2E NOT RUN and residual AC-NFR-1-1 gap explicitly ACCEPTED; 6.1 remains skipped per PM; TC-READTIME-012 remains N/A. No E2E or dev-server command was run during this execution.
 - Final quality gates: `bunx vitest run` PASS (11 files / 231 tests); `bun run build` PASS (Angular bundle generated); `bun run format` PASS; `bun run format:check` PASS (all matched files formatted). No E2E is claimed.
-- Phase closure blocked: the required `@committer` delegation could not dispatch because the runtime reports the subagent-depth limit. No commit was created, and the phase remains In progress. Retry with a committer-enabled runtime using the explicit safe path list in the user directive; `.gitignore` and PM notes remain unstaged/untouched by this executor.
+- Historical executor handoff: committer dispatch was unavailable at that time. Subsequently, remediation was committed in `eb2f9a7` and documentation in `729a675`; independent review iteration 2 closes the phase below. Reviewer creates no commit.
+
+### Review iteration 2 / Phase 7 closeout (2026-10-06)
+
+**Status: PASS. Phase 7: Completed. Findings: 0 (0 critical / 0 major / 0 minor / 0 nit).** No additional remediation phase or tasks required. The iteration-1 FAIL entry above remains historical evidence, superseded by this closeout.
+
+- Finding 7.1 resolved: emphasis-character removal no longer inserts word boundaries; independent 200/201-word regression pairs cover literal identifiers, inline code, and intraword formatting. Existing syntax-family, whitespace, minimum, and long-body tests remain green. Removing literal punctuation does not alter whitespace-token counts for those words; exhaustive Markdown parsing is not required.
+- Finding 7.2 resolved: timing ends before the correctness assertion, and the test/output explicitly identify diagnostic measurements rather than a mandatory threshold gate. Reviewer focused measurement on Node v22.17.1, Linux/x64, Intel Core i7-1365U (virtualized environment): median 0.5625 ms, maximum 2.6541 ms, 100/100 below 5 ms. This supports NFR-1 alongside the retained earlier measurements; no universally idle-machine guarantee or shared-suite timing gate is claimed, and the earlier 5.1604-ms loaded-suite outlier remains recorded.
+- Finding 7.3 resolved: real page content is asserted after async rendering; absent-body rendering is safe; exact dates, author links, avatars, and projected favorite components are checked. Preview service dependencies are controlled, and zero detail fetches are asserted through absent/present/absent updates and repeated detection.
+- Reviewer commands: `bunx vitest run` PASS (11 files / 231 tests); focused pipe command PASS (33 tests); Prettier check for remediation source/spec files PASS. Coder-reported build and full-format success retained; not independently rerun. No source, debug-interface, API, or submodule-pointer regression found in the reviewed diff.
+- Plan status: ALL_TASKS_DONE after closing 5.2/5.3 and Phase 7. No OPEN_TASKS, DONE_BUT_UNCHECKED, or CHECKED_BUT_MISSING gaps remain for this review. E2E remains unexecuted with the explicit user-accepted residual gap; version skip, TC-READTIME-012 N/A, and no system-spec update remain respected.
+- Next step: PROCEED to PM quality/DoD and human review. Reviewer changed only this plan and iteration-2 review artifacts, preserved pre-existing workspace modifications, and did not commit.
