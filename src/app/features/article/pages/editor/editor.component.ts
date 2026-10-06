@@ -47,7 +47,7 @@ export default class EditorComponent implements OnInit {
         .subscribe(([article, { user }]) => {
           if (user.username === article.author.username) {
             this.tagList.set(article.tagList);
-            this.articleForm.patchValue(article);
+            this.articleForm.patchValue({ ...article, body: article.body ?? '' });
           } else {
             void this.router.navigate(['/']);
           }
