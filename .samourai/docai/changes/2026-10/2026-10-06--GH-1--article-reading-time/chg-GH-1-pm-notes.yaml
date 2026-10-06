@@ -7,9 +7,9 @@ phases:
   specification: { started: "2026-10-06T13:09:17Z", completed: "2026-10-06T13:11:36Z" }
   test_planning: { started: "2026-10-06T13:11:36Z", completed: "2026-10-06T13:18:02Z" }
   delivery_planning: { started: "2026-10-06T13:18:02Z", completed: "2026-10-06T13:22:08Z" }
-  delivery: { started: "2026-10-06T13:22:08Z", completed: null }
-  system_spec_update: { started: null, completed: null }
-  review_fix: { started: null, completed: null }
+  delivery: { started: "2026-10-06T13:22:08Z", completed: "2026-10-06T14:08:51Z" }
+  system_spec_update: { started: "2026-10-06T14:08:51Z", completed: "2026-10-06T15:09:49Z" }
+  review_fix: { started: "2026-10-06T15:09:49Z", completed: null }
   quality_gates: { started: null, completed: null }
   dod_check: { started: null, completed: null }
   pr_creation: { started: null, completed: null, url: null }
@@ -36,6 +36,14 @@ decisions:
     date: "2026-10-06"
   - text: "Plan task 6.4: E2E against public https://api.realworld.show/api approved by PM (repo default setup; user asked for full end-to-end run)."
     date: "2026-10-06"
+  - text: >-
+      E2E residual gap ACCEPTED by user ("oublie ça et avance"): `bun run test:e2e` could not run locally —
+      user-owned ng serve (pid 22858) holds 127.0.0.1:4200 but does not respond; Playwright probes localhost (::1)
+      and fails on port conflict; alternate-port attempt (4300) timed out. Unverified: E2E part of AC-NFR-1-1.
+      Mitigation: full Vitest suite (228 tests), build, format check, manual browser checks. E2E to be confirmed in CI / by reviewer.
+    date: "2026-10-06"
+  - text: "System docs: @doc-syncer found no system spec to reconcile (.samourai/docai/spec absent); no update required."
+    date: "2026-10-06"
 open_questions: []
 blockers:
   - text: "Waiting for product owner decision on preview behavior"
@@ -55,6 +63,16 @@ notes:
     type: retro
     date: "2026-10-06"
   - text: "Test planning blocked twice: repo lacked .samourai/ai/rules/testing-strategy.md (Samourai onboarding incomplete); @test-plan-writer refused PM-provided fallback; @architect can't write rules files -> 3 extra delegations. Run /bootstrap on new repos before first change."
+    type: retro
+    date: "2026-10-06"
+  - text: >-
+      @committer incident: (1) first commit shipped a generic, invented testing-strategy.md instead of the
+      architect-drafted content (fixed in 3cbecdb); (2) when asked to run `git reset -q`, it did a hard reset,
+      wiping the user's uncommitted .gitignore edits (restored byte-identical by @coder from the earlier diff).
+      Lesson: give @committer explicit command lists + forbidden git commands; never ask it to touch the index.
+    type: retro
+    date: "2026-10-06"
+  - text: "E2E env debugging (port 4200 held by unresponsive user dev server, IPv6 localhost probe, 4300 timeout) consumed ~1h across 3 delegations before user dropped it. Next time: ask user upfront to stop their dev server or accept E2E gap early."
     type: retro
     date: "2026-10-06"
   - text: "Blocking question was resolved by PM decision after user requested end-to-end run; decision logged on ticket"
