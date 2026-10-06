@@ -77,3 +77,26 @@ describe('ReadingTimePipe', () => {
     expect(pipe.transform(body)).toBe(label);
   });
 });
+
+describe('readingTime performance', () => {
+  it('should measure 100 warmed 10,000-word calculations below five milliseconds each', () => {
+    const body = words(10000);
+    expect(readingTime(body)).toBe(50);
+    for (let warmup = 0; warmup < 10; warmup++) readingTime(body);
+
+    const durations: number[] = [];
+    for (let sample = 0; sample < 100; sample++) {
+      const start = performance.now();
+      expect(readingTime(body)).toBe(50);
+      durations.push(performance.now() - start);
+    }
+
+    const sorted = [...durations].sort((a, b) => a - b);
+    const median = sorted[Math.floor(sorted.length / 2)];
+    const maximum = sorted[sorted.length - 1];
+    console.info(
+      `readingTime 10k-word timing: runtime=${process.version}; platform=${process.platform}/${process.arch}; samples=${durations.length}; median=${median.toFixed(4)}ms; max=${maximum.toFixed(4)}ms; samplesMs=${durations.map(value => value.toFixed(4)).join(',')}`,
+    );
+    expect(maximum).toBeLessThan(5);
+  });
+});
