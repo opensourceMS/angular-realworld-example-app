@@ -45,7 +45,7 @@
     <div class="container page">
       <div class="row article-content">
         <div class="col-md-12">
-          <div [innerHTML]="a.body | markdown | async"></div>
+          <div [innerHTML]="a.body ?? '' | markdown | async"></div>
 
           <ul class="tag-list">
             @for (tag of a.tagList; track tag) {

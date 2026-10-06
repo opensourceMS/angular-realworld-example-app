@@ -3,6 +3,7 @@ import { Article } from '../models/article.model';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { DefaultImagePipe } from '../../../shared/pipes/default-image.pipe';
+import { ReadingTimePipe } from '../../../shared/pipes/reading-time.pipe';
 
 @Component({
   selector: 'app-article-meta',
@@ -19,13 +20,16 @@ import { DefaultImagePipe } from '../../../shared/pipes/default-image.pipe';
         <span class="date">
           {{ article.createdAt | date: 'longDate' }}
         </span>
+        @if (article.body != null) {
+          <span class="reading-time">{{ article.body | readingTime }}</span>
+        }
       </div>
 
       <ng-content></ng-content>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DatePipe, DefaultImagePipe],
+  imports: [RouterLink, DatePipe, DefaultImagePipe, ReadingTimePipe],
 })
 export class ArticleMetaComponent {
   @Input() article!: Article;

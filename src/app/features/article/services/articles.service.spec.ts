@@ -1,8 +1,5 @@
-import 'zone.js';
-import 'zone.js/testing';
-import { describe, it, expect, beforeEach, afterEach, beforeAll, vi } from 'vitest';
-import { TestBed, getTestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { firstValueFrom } from 'rxjs';
 import { ArticlesService } from './articles.service';
@@ -10,10 +7,6 @@ import { Article } from '../models/article.model';
 import { ArticleListConfig } from '../models/article-list-config.model';
 
 describe('ArticlesService', () => {
-  beforeAll(() => {
-    getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
-  });
-
   let service: ArticlesService;
   let httpMock: HttpTestingController;
 
@@ -43,6 +36,18 @@ describe('ArticlesService', () => {
       title: 'Second Article',
     },
   ];
+
+  const listArticleWithoutBody: Article = {
+    slug: 'list-article',
+    title: 'List Article',
+    description: 'List description',
+    tagList: [],
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-02',
+    favorited: false,
+    favoritesCount: 0,
+    author: mockArticle.author,
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -86,6 +91,18 @@ describe('ArticlesService', () => {
       const req = httpMock.expectOne('/articles/feed');
       expect(req.request.method).toBe('GET');
       req.flush({ articles: mockArticleList, articlesCount: 2 });
+    });
+
+    it('should preserve articles whose list response omits the body', () => {
+      let response: Article[] | undefined;
+      service.query({ type: 'all', filters: {} }).subscribe(result => (response = result.articles));
+
+      const req = httpMock.expectOne('/articles');
+      expect(req.request.method).toBe('GET');
+      req.flush({ articles: [listArticleWithoutBody], articlesCount: 1 });
+
+      expect(response).toEqual([listArticleWithoutBody]);
+      expect(response?.[0]).not.toHaveProperty('body');
     });
 
     it('should include query parameters from filters', () => {

@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "severity": "major",
+    "confidence": "high",
+    "file": "src/app/shared/pipes/reading-time.pipe.ts",
+    "line": 11,
+    "title": "Preserve literal and intraword content instead of splitting it",
+    "description": "The global emphasis-character-to-space replacement changes whitespace-separated words into multiple tokens. Independently reproduced: 199 plain words plus snake_case, inline-code snake_case, or pre**fix** returns 2 minutes instead of 1. Literal underscores are not Markdown emphasis here, and the plan explicitly requires retaining code content and content that merely resembles punctuation; this is a practical AC1 error, not an exhaustive-parser requirement.",
+    "suggestedFix": "Add independent 200/201-word boundary regressions for literal identifiers, code identifiers, and intraword formatting, then use practical delimiter-aware stripping that preserves content and word boundaries. Keep existing syntax-family tests green.",
+    "suppressed": false
+  },
+  {
+    "id": 2,
+    "severity": "minor",
+    "confidence": "high",
+    "file": "src/app/shared/pipes/reading-time.pipe.spec.ts",
+    "line": 90,
+    "title": "Measure only the calculation and label diagnostic timings accurately",
+    "description": "The measured interval includes expect(...).toBe(50), so the samples do not isolate readingTime latency. The test says every calculation is below five milliseconds but only logs the threshold count; it passes regardless of timing. The reported 5.1604-ms suite-load outlier therefore does not establish a calculation regression, nor does a green suite establish NFR-1 compliance.",
+    "suggestedFix": "Capture the return value, stop timing, and assert afterward. Label normal-suite timing as diagnostic, and obtain explicit focused NFR-1 measurement/disposition on an identified idle representative machine; retain outliers rather than introducing a flaky shared-suite timing assertion.",
+    "suppressed": false
+  },
+  {
+    "id": 3,
+    "severity": "minor",
+    "confidence": "high",
+    "file": "src/app/features/article/pages/article/article.component.spec.ts",
+    "line": 64,
+    "title": "Complete the claimed rendering and request-preservation assertions",
+    "description": "The page preservation assertion only checks the article-content container, so it would pass if the modified Markdown binding rendered nothing for a present body. The preview test named avoid body-fetch calls has no service spies or request assertions and never changes its input. Exact date/author-link/image/action preservation checks promised by checked plan tasks are also incomplete.",
+    "suggestedFix": "Assert asynchronously rendered Markdown content and genuinely omitted-body fallback, use controlled preview service dependencies to check no fetching during rendering/input changes, and add the concrete metadata/action preservation assertions promised by tasks 3.2 and 4.1–4.3.",
+    "suppressed": false
+  }
+]
