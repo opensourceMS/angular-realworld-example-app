@@ -8,7 +8,7 @@ service: conduit-frontend-articles
 labels: [change]
 links:
   change_spec: ./chg-GH-1-spec.md
-  implementation_plan: null
+   implementation_plan: ./chg-GH-1-plan.md
   testing_strategy: ../../../../ai/rules/testing-strategy.md
 version_impact: minor
 summary: 'Verify article reading-time calculation, conditional display, optional body compatibility, and regression gates for GH-1.'
@@ -42,7 +42,7 @@ Verify that reading time is calculated locally at 200 words per minute, rounded 
 - [PM notes](./chg-GH-1-pm-notes.yaml): preview behavior, placement, optional Article body, and identified touchpoints.
 - [Canonical repository testing strategy](../../../../ai/rules/testing-strategy.md).
 - Structural guidance: `.samourai/core/templates/test-plan-template.md`, `.samourai/blueprints/testing/test.blueprint.yaml`, and `.samourai/blueprints/testing/test-plan.template.md`.
-- Implementation plan: not present at authoring; section 7 identifies proposed test locations, not approved implementation filenames.
+- [Implementation plan](./chg-GH-1-plan.md): canonical task ordering and execution evidence.
 
 **Strategy source:** The canonical `testing-strategy.md` is now present and was read for this plan. PM-provided repository context supplements it; the earlier missing-file exception is no longer needed. The canonical strategy clarifies that there is no supported local `e2e/` directory despite the spec's tooling reference.
 
@@ -65,13 +65,13 @@ F-4 additionally maps to TC-READTIME-006 and TC-READTIME-011: a typed preview fi
 
 ### 3.2 Interface Coverage (API-#, EVT-#, DM-#)
 
-| Interface                                              | Scope                                                                                  | TC IDs                                            | Status                                                             |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------ |
-| DM-1                                                   | Client Article body becomes optional; omitted-body fixture compiles and renders safely | TC-READTIME-006, TC-READTIME-011                  | Planned                                                            |
-| Existing `GET /api/articles/:slug`                     | Unchanged body-present response consumed by article page                               | TC-READTIME-007, TC-READTIME-010, TC-READTIME-012 | Component/manual coverage planned; backend API E2E automation TODO |
-| Existing `GET /api/articles`, `GET /api/articles/feed` | Unchanged body-absent list responses; no per-preview body fetch                        | TC-READTIME-006, TC-READTIME-010, TC-READTIME-012 | Component/manual coverage planned; backend API E2E automation TODO |
+| Interface                                              | Scope                                                                                  | TC IDs                           | Status                                                     |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------- | -------------------------------- | ---------------------------------------------------------- |
+| DM-1                                                   | Client Article body becomes optional; omitted-body fixture compiles and renders safely | TC-READTIME-006, TC-READTIME-011 | Planned                                                    |
+| Existing `GET /api/articles/:slug`                     | Unchanged body-present response consumed by article page                               | TC-READTIME-007, TC-READTIME-010 | Component/manual coverage; shared E2E attempted in Phase 6 |
+| Existing `GET /api/articles`, `GET /api/articles/feed` | Unchanged body-absent list responses; no per-preview body fetch                        | TC-READTIME-006, TC-READTIME-010 | Component/manual coverage; shared E2E attempted in Phase 6 |
 
-The spec assigns no API-_ or EVT-_ IDs and introduces no events or changed HTTP contract. TC-READTIME-012 explicitly records the API E2E location gap because existing HTTP interfaces are referenced; it does not add backend requirements or authorize new E2E tests.
+The spec assigns no API-_ or EVT-_ IDs and introduces no events or changed HTTP contract. Per PM decision, TC-READTIME-012 is N/A: endpoints are unchanged, shared E2E coverage already exercises those endpoints, and no new E2E tests are authorized or needed.
 
 ### 3.3 Non-Functional Coverage (NFR-#)
 
@@ -94,7 +94,7 @@ The spec assigns no API-_ or EVT-_ IDs and introduces no events or changed HTTP 
 
 Use `bunx vitest run` rather than watch mode. Import Vitest APIs explicitly; globals are disabled. Follow existing `describe('Subject')` / `it('should ...')` conventions. Use the configured Angular Vite plugin, jsdom, Zone.js, and shared `src/test-setup.ts`; do not reinitialize TestBed globally. Reset mocks and fixtures between tests. HTTP mocks must be verified after each test.
 
-Backend API E2E means real HTTP against a running backend, not HttpTestingController. The strategy has no approved writable backend API E2E location for this change; TC-READTIME-012 and section 8 record that gap. No Docker/Compose dependency is assumed.
+Backend API E2E means real HTTP against a running backend, not HttpTestingController. PM resolved TC-READTIME-012 as N/A because this change alters no endpoint/contract and the existing shared E2E suite covers existing flows. No new automation or `realworld/` edits are authorized or needed.
 
 ## 5. Test Scenarios
 
@@ -113,7 +113,7 @@ Backend API E2E means real HTTP against a running backend, not HttpTestingContro
 | TC-READTIME-009 | Measure long-body calculation latency         | Edge Case     | Important | Medium   | Performance       | F-1, NFR-1                             |
 | TC-READTIME-010 | Add no network traffic                        | Regression    | Important | High     | Unit, Manual      | F-3, NFR-3, AC-NFR-1-1                 |
 | TC-READTIME-011 | Run full regression and quality gates         | Regression    | Important | High     | Unit, E2E, Manual | F-4, DM-1, AC-F-1-3, AC-NFR-1-1        |
-| TC-READTIME-012 | Resolve real-HTTP API E2E coverage location   | Regression    | Important | Medium   | E2E               | Existing HTTP interfaces; TODO         |
+| TC-READTIME-012 | N/A per PM decision: unchanged HTTP contracts | N/A           | —         | —        | N/A               | No new AC; existing endpoints only     |
 
 ### 5.2 Scenario Details
 
@@ -423,31 +423,18 @@ Backend API E2E means real HTTP against a running backend, not HttpTestingContro
 - Existing non-security E2E suite remains green; `.article-meta`, `.date`, and `window.__conduit_debug__` compatibility is retained.
 - A blocked E2E run is marked Blocked/Not run. AC-NFR-1-1 remains partially unverified until rerun or explicit PM/human disposition; fallback results are not labeled E2E success.
 
-#### TC-READTIME-012 - Resolve real-HTTP API E2E coverage location
+#### TC-READTIME-012 - N/A per PM decision
 
-**Scenario Type**: Regression  
-**Impact Level**: Important  
-**Priority**: Medium  
+**Scenario Type**: Not applicable  
+**Impact Level**: —  
+**Priority**: —  
 **Related IDs**: Existing HTTP interfaces in spec section 8.1; no API-\* IDs or changed backend acceptance path  
-**Test Type(s)**: E2E  
-**Automation Level**: Semi-automated  
-**Target Layer / Location**: TODO — strategy provides read-only shared `realworld/specs/e2e/` only; no approved writable backend API E2E location  
-**Tags**: @backend @api @e2e
+**Test Type(s)**: None  
+**Automation Level**: N/A  
+**Target Layer / Location**: No additional test/location; shared `realworld/` remains read-only  
+**Tags**: None
 
-**Preconditions**:
-
-- TODO: PM/engineering confirms whether existing real-HTTP shared coverage is sufficient for unchanged endpoints or approves a location and execution path. No new E2E implementation is authorized by this plan.
-
-**Steps**:
-
-1. After that decision and external-service approval, use HTTP/the real API client against a running service to read a known article and its list response.
-2. Verify successful status, response body shape, and relevant JSON content-type header; confirm detail body is available and the current list response omits body.
-3. Correlate those responses with the client show/hide checks in TC-READTIME-006 and TC-READTIME-007.
-
-**Expected Outcome**:
-
-- Unchanged read endpoints return their documented representation; no persisted/downstream change is required by this frontend-only feature.
-- TODO remains explicit until the coverage decision and runnable path are documented. Mocked HTTP or UI unit checks must not be reported as backend API E2E evidence.
+**Disposition**: PM resolved this scenario as N/A because the existing API endpoints and contracts do not change and shared E2E covers existing flows. No new test, automation location, or submodule modification is in scope.
 
 ## 6. Environments and Test Data
 
@@ -503,22 +490,22 @@ Run `bunx vitest run`, `bunx ng build`, and `bun run format:check`; retain targe
 
 All new executable specs must be co-located under `src/**/*.spec.ts`. The filenames below are proposed where implementation names are not yet fixed; keep actual names aligned with their source files. Do not create a new test runner/configuration or modify `realworld/`.
 
-| TC ID           | Test file / evidence location                                                                                | Command / method                                                               | Mocking and data                                                              | Implementation status                                              |
-| --------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| TC-READTIME-001 | `src/app/shared/utils/reading-time.spec.ts` beside the eventual function                                     | `bunx vitest run` or focused spec run                                          | Boundary/long plain fixtures; no mocks                                        | To Implement                                                       |
-| TC-READTIME-002 | Function spec and `src/app/shared/pipes/reading-time.pipe.spec.ts`                                           | `bunx vitest run`                                                              | Minimum-body table                                                            | To Implement                                                       |
-| TC-READTIME-003 | Function spec                                                                                                | `bunx vitest run`                                                              | Independent boundary-padded Markdown fixtures                                 | To Implement                                                       |
-| TC-READTIME-004 | `src/app/shared/pipes/reading-time.pipe.spec.ts`                                                             | `bunx vitest run`                                                              | Real pure function/pipe; no backend                                           | To Implement                                                       |
-| TC-READTIME-005 | `article-meta.component.spec.ts` beside existing meta component                                              | `bunx vitest run`                                                              | TestBed, real template/pipe, fixed author/date and body variants              | To Implement                                                       |
-| TC-READTIME-006 | `article-preview.component.spec.ts` beside existing preview component; manual evidence here                  | `bunx vitest run`; manual checklist                                            | Typed body-omitting Article, real meta, isolated collaborators                | To Implement; manual follow-up                                     |
-| TC-READTIME-007 | `src/app/features/article/pages/article/article.component.spec.ts`; manual evidence here                     | `bunx vitest run`; manual checklist                                            | Controlled article load, real page/meta templates, unrelated services doubled | To Implement; manual follow-up                                     |
-| TC-READTIME-008 | Function spec and implementation review evidence                                                             | `bunx vitest run`                                                              | Repeated/interleaved inputs; isolated side-effect spies                       | To Implement                                                       |
-| TC-READTIME-009 | Focused timing case alongside the function spec; developer-machine measurements here                         | Focused `bunx vitest run` timing harness plus recorded measurements            | Prebuilt 10,000-word fixture; no network                                      | To Implement; measured follow-up                                   |
-| TC-READTIME-010 | Preview/page specs; browser Network evidence here                                                            | `bunx vitest run`; manual network comparison                                   | HttpTestingController/service spies, controlled list/detail responses         | To Implement; manual follow-up                                     |
-| TC-READTIME-011 | Existing `src/**/*.spec.ts`, new change specs, read-only `realworld/specs/e2e/*.spec.ts`; gate evidence here | `bunx vitest run`; `bunx ng build`; `bun run format:check`; `bun run test:e2e` | Existing suite fixtures and approved backend; fallback if unavailable         | Existing – No Change for shared E2E; run all gates after new specs |
-| TC-READTIME-012 | TODO: approved real-HTTP API E2E location/run path; decision recorded here                                   | TODO: no approved new automation command                                       | Running service, known read-only article, approval; no HTTP mocks             | TODO – blocked pending coverage/location decision                  |
+| TC ID           | Test file / evidence location                                                                                | Command / method                                                               | Mocking and data                                                              | Implementation status                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| TC-READTIME-001 | `src/app/shared/pipes/reading-time.pipe.spec.ts` beside exported function                                    | `bunx vitest run src/app/shared/pipes/reading-time.pipe.spec.ts`               | Boundary/long plain fixtures; no mocks                                        | Implemented; run recorded in execution log                                |
+| TC-READTIME-002 | `src/app/shared/pipes/reading-time.pipe.spec.ts`                                                             | Focused Vitest spec                                                            | Minimum-body table                                                            | Implemented                                                               |
+| TC-READTIME-003 | `src/app/shared/pipes/reading-time.pipe.spec.ts`                                                             | Focused Vitest spec                                                            | Independent boundary-padded Markdown fixtures                                 | Implemented                                                               |
+| TC-READTIME-004 | `src/app/shared/pipes/reading-time.pipe.spec.ts`                                                             | Focused Vitest spec                                                            | Real pure function/pipe; no backend                                           | Implemented                                                               |
+| TC-READTIME-005 | `src/app/features/article/components/article-meta.component.spec.ts`                                         | Focused Vitest spec                                                            | TestBed, real template/pipe, fixed author/date and body variants              | Implemented                                                               |
+| TC-READTIME-006 | `src/app/features/article/components/article-preview.component.spec.ts`; manual evidence below               | Focused Vitest spec; manual checklist                                          | Typed body-omitting Article and real meta composition                         | Implemented; home list manual check passed                                |
+| TC-READTIME-007 | `src/app/features/article/pages/article/article.component.spec.ts`; manual evidence below                    | Focused Vitest spec; manual checklist                                          | Controlled article load, real page/meta templates, controlled service doubles | Implemented; manual follow-up                                             |
+| TC-READTIME-008 | `src/app/shared/pipes/reading-time.pipe.spec.ts` and implementation review                                   | Focused Vitest spec                                                            | Repeated/interleaved inputs; pure implementation review                       | Implemented                                                               |
+| TC-READTIME-009 | Focused timing harness alongside the pipe spec; developer-machine measurements here                          | Focused Vitest/timing harness plus recorded measurements                       | Prebuilt 10,000-word fixture; no network                                      | Pending Phase 6                                                           |
+| TC-READTIME-010 | Preview/page specs; browser Network evidence below                                                           | Vitest; manual network comparison                                              | Controlled list/detail responses and page service spies                       | Unit + home/article Network observations passed; remaining manual pending |
+| TC-READTIME-011 | Existing `src/**/*.spec.ts`, new change specs, read-only `realworld/specs/e2e/*.spec.ts`; gate evidence here | `bunx vitest run`; `bun run build`; `bun run format:check`; `bun run test:e2e` | Existing suite and approved public backend                                    | Unit/build passed; E2E infra blocked, format pending                      |
+| TC-READTIME-012 | N/A per PM decision: no API/endpoint contract change; shared E2E suite remains read-only                     | Not applicable; no new automation                                              | Existing endpoint requests exercised by shared suite                          | N/A; no action                                                            |
 
-Implement lower-layer tests before production changes when practical. Run focused specs during development, then the full gates. AC-F-1-3 requires actual discovered tests for all listed categories, not just this design matrix. The separate security E2E suite is not required for this security-impact-none change unless scope changes.
+Implementation tests were written before production behavior changes and are co-located under the final filenames above. Run focused specs during development, then the full gates. AC-F-1-3 requires actual discovered tests for all listed categories, not just this design matrix. The separate security E2E suite is not required for this security-impact-none change unless scope changes.
 
 ## 8. Risks, Assumptions, and Open Questions
 
@@ -529,22 +516,22 @@ Implement lower-layer tests before production changes when practical. Run focuse
 - RSK-3: Optional body may affect the editor or other consumers. Use a cast-free omitted-body fixture, run full unit coverage and build, and manually verify any adjusted consumer.
 - RSK-4: Current previews legitimately hide reading time. Manual assertions must use actual response shape, not assume bodies exist or add fetches.
 - Timing noise can obscure NFR-1. Record representative machine details and individual timing results; distinguish failures from unsuitable environments.
-- Missing browser/backend/approval blocks E2E evidence. Preserve the outstanding AC-NFR-1-1 gap and its owner rather than treating fallback as success.
+- E2E launch is currently blocked by port 4200 already being served by an existing development server. Preserve the outstanding AC-NFR-1-1 gap and its engineering rerun/PM disposition rather than treating fallback as success.
 
 ### 8.2 Assumptions
 
 - Spec DEC-1 through DEC-4 and PM notes define behavior: null/undefined hide; empty string shows; date-adjacent placement; optional body; pure function and pipe.
 - Words are whitespace-separated tokens after practical syntax stripping; 200 WPM is fixed.
 - Existing detail/list endpoints remain unchanged. No new backend acceptance path or data mutation is introduced.
-- Implementation plan and exact utility filenames are not yet available; section 7 locations are proposed co-location mappings, not requirements for production layout.
+- Implementation plan and exact utility filenames are finalized in [the implementation plan](./chg-GH-1-plan.md); section 7 maps the final co-located paths.
 
 ### 8.3 Open Questions
 
-| Question                                                                                                                                                                 | Impact / disposition                                                                                                                                                                                                                               | Owner                                        |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| For unchanged referenced HTTP interfaces, is existing shared real-HTTP E2E coverage sufficient, or where should any backend API E2E checks live and how should they run? | TC-READTIME-012 TODO. No writable API E2E convention exists; local additions are not discovered and the shared submodule must remain unchanged. Do not add tests without an approved convention decision. Not a new frontend behavior requirement. | PM / engineering                             |
-| Should nonempty image alt text or fence language labels count as words?                                                                                                  | Non-blocking clarification of “where practical”; exact-count fixtures avoid both ambiguities. Record a decision before asserting a specific count for those forms.                                                                                 | PM / engineering                             |
-| If E2E is unavailable at execution, when will it be rerun or who explicitly accepts the remaining evidence gap?                                                          | Conditional gate question, not a current observed failure. AC-NFR-1-1 remains partially unverified until disposition; record actual reason and follow-up in section 10.                                                                            | Engineering rerun owner; PM / human approver |
+| Question                                                                                                                                                                 | Impact / disposition                                                                                                                                                          | Owner                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| For unchanged referenced HTTP interfaces, is existing shared real-HTTP E2E coverage sufficient, or where should any backend API E2E checks live and how should they run? | Resolved by PM: TC-READTIME-012 is N/A because endpoint contracts are unchanged and existing shared E2E exercises them. No new E2E path/spec; `realworld/` remains read-only. | PM (resolved)                                |
+| Should nonempty image alt text or fence language labels count as words?                                                                                                  | Non-blocking clarification of “where practical”; exact-count fixtures avoid both ambiguities. Record a decision before asserting a specific count for those forms.            | PM / engineering                             |
+| If E2E is unavailable at execution, when will it be rerun or who explicitly accepts the remaining evidence gap?                                                          | Conditional gate question, not a current observed failure. AC-NFR-1-1 remains partially unverified until disposition; record actual reason and follow-up in section 10.       | Engineering rerun owner; PM / human approver |
 
 ## 9. Plan Revision Log
 
@@ -554,9 +541,17 @@ Implement lower-layer tests before production changes when practical. Run focuse
 
 ## 10. Test Execution Log
 
-No tests or quality gates were executed while authoring this plan. All scenario outcomes are Not run; no pass result is implied by coverage mapping. For execution, add per-TC results, commands, timestamps, environment, evidence, and any blocked prerequisite/error. Keep failed/blocked attempts visible when recording reruns.
+Record executed commands/results below; keep blocked attempts visible. Unrun gates are explicitly Not run.
 
-| TC ID / gate                    | Run date (UTC) | Result  | Evidence / notes                                               | Follow-up owner  |
-| ------------------------------- | -------------- | ------- | -------------------------------------------------------------- | ---------------- |
-| All planned scenarios and gates | Not run        | Not run | Planning only; no implementation or runtime evidence collected | Engineering      |
-| TC-READTIME-012                 | Not run        | TODO    | No approved writable backend API E2E path; see section 8       | PM / engineering |
+| TC ID / gate                                     | Run date (UTC) | Result                  | Evidence / notes                                                                                                                                                                                                                                                                                                                        | Follow-up owner                         |
+| ------------------------------------------------ | -------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| TC-READTIME-001–008                              | 2026-10-06     | Passed                  | `bunx vitest run src/app/features/article/pages/article/article.component.spec.ts src/app/features/article/components/article-preview.component.spec.ts src/app/features/article/components/article-meta.component.spec.ts src/app/shared/pipes/reading-time.pipe.spec.ts`: 4 files, 44 tests passed                                    | None                                    |
+| TC-READTIME-006/007/010                          | 2026-10-06     | Passed (unit)           | Above component tests; no live network in units. Service list omission/request and page service call counts separately asserted.                                                                                                                                                                                                        | Manual Network still pending            |
+| TC-READTIME-011 build                            | 2026-10-06     | Passed                  | `bun run build`: Angular bundle generated successfully.                                                                                                                                                                                                                                                                                 | None                                    |
+| TC-READTIME-011 full suite                       | 2026-10-06     | Passed                  | `bunx vitest run`: 11 files, 227 tests passed after correcting five legacy specs' duplicate TestBed initialization (they now rely on shared `src/test-setup.ts`).                                                                                                                                                                       | None                                    |
+| Editor preservation                              | 2026-10-06     | Passed                  | `bunx vitest run src/app/features/article/pages/editor/editor.component.spec.ts`: 2 passed; omitted body normalizes to empty body control.                                                                                                                                                                                              | None                                    |
+| Article service contract                         | 2026-10-06     | Passed                  | `bunx vitest run src/app/features/article/services/articles.service.spec.ts`: 16 passed; omission and create/update request payloads preserved.                                                                                                                                                                                         | None                                    |
+| TC-READTIME-012                                  | N/A            | N/A                     | PM resolved unchanged-endpoint/API coverage concern; no new E2E tests/submodule edits.                                                                                                                                                                                                                                                  | None                                    |
+| TC-READTIME-011 E2E (attempt 1)                  | 2026-10-06     | Failed (infrastructure) | `bun run test:e2e` could not start configured webServer because port 4200 already in use; an existing dev server owned that port.                                                                                                                                                                                                       | Engineering rerun                       |
+| TC-READTIME-011 E2E (attempt 2)                  | 2026-10-06     | Failed (infrastructure) | After one `bunx playwright install chromium` attempt, `PLAYWRIGHT_HTML_OUTPUT_DIR=.samourai/tmpai/playwright-report bunx playwright test --grep-invert @security --config=playwright.config.ts` still failed because webServer tried to start `ng serve` while the existing port 4200 server was running. No shared E2E assertions ran. | Engineering rerun; PM/human disposition |
+| Format, performance, E2E, remaining manual flows | Not run        | Not run                 | Pending final gate closure; do not infer these from component tests.                                                                                                                                                                                                                                                                    | Engineering                             |
