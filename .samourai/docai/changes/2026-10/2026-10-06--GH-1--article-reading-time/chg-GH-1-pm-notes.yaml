@@ -1,0 +1,62 @@
+change_id: GH-1
+title: "feat: display estimated reading time on articles"
+issue_url: https://github.com/opensourceMS/angular-realworld-example-app/issues/1
+branch: feat/GH-1/article-reading-time
+phases:
+  clarify_scope: { started: "2026-10-06T13:08:01Z", completed: "2026-10-06T13:09:17Z" }
+  specification: { started: "2026-10-06T13:09:17Z", completed: "2026-10-06T13:11:36Z" }
+  test_planning: { started: "2026-10-06T13:11:36Z", completed: "2026-10-06T13:18:02Z" }
+  delivery_planning: { started: "2026-10-06T13:18:02Z", completed: "2026-10-06T13:22:08Z" }
+  delivery: { started: "2026-10-06T13:22:08Z", completed: null }
+  system_spec_update: { started: null, completed: null }
+  review_fix: { started: null, completed: null }
+  quality_gates: { started: null, completed: null }
+  dod_check: { started: null, completed: null }
+  pr_creation: { started: null, completed: null, url: null }
+decisions:
+  - text: >-
+      PM-decided (user asked to run full workflow without waiting): option D. Reading time is
+      displayed in app-article-meta only when `article.body` is defined (not null/undefined).
+      Article page (single-article endpoint returns body) -> always shown, incl. empty body -> "1 min read".
+      Previews (list endpoints omit body per RealWorld API since 2024-08-16) -> hidden; shown if a
+      backend still returns body. Rationale: honest data (no misleading "1 min read"), no N+1 requests,
+      single condition in shared component, reversible.
+    date: "2026-10-06"
+  - text: "Placement: next to the date inside app-article-meta, so it appears in both banner and bottom article-actions on the article page."
+    date: "2026-10-06"
+  - text: "Article model: `body` becomes optional (`body?: string`) to reflect list responses accurately."
+    date: "2026-10-06"
+  - text: >-
+      TC-READTIME-012 (real-HTTP API E2E) resolved as N/A: no endpoint/contract change; existing shared
+      realworld E2E suite already exercises these endpoints. No new E2E location introduced.
+    date: "2026-10-06"
+  - text: "Testing strategy .samourai/ai/rules/testing-strategy.md created (drafted by @architect from repo scan, written by @coder) and shipped with this change as onboarding prerequisite."
+    date: "2026-10-06"
+  - text: "Plan task 6.1 (minor version bump): PM-decided SKIP — package.json is 0.0.0, the app is an unreleased example app with no versioning/release process."
+    date: "2026-10-06"
+  - text: "Plan task 6.4: E2E against public https://api.realworld.show/api approved by PM (repo default setup; user asked for full end-to-end run)."
+    date: "2026-10-06"
+open_questions: []
+blockers:
+  - text: "Waiting for product owner decision on preview behavior"
+    date: "2026-10-06"
+    resolved_date: "2026-10-06"
+notes:
+  - text: "No system spec (.samourai/docai/spec/**) and no pm-instructions.md in repo; cross-check done against code + realworld submodule API spec/OpenAPI"
+    type: risk
+    date: "2026-10-06"
+  - text: "Article model (src/app/features/article/models/article.model.ts) types `body: string` as required, but list responses omit it -> treat as possibly undefined in the computation"
+    type: info
+    date: "2026-10-06"
+  - text: "Touchpoints identified: article-meta.component.ts (shared by preview and article page), article-preview.component.ts, pages/article/article.component.html; new pure pipe under src/app/shared/pipes/ (existing pattern: default-image.pipe)"
+    type: info
+    date: "2026-10-06"
+  - text: "Ticket risk section already flagged the missing body; checking the API spec before writing the ticket would have caught it and avoided a clarify round-trip"
+    type: retro
+    date: "2026-10-06"
+  - text: "Test planning blocked twice: repo lacked .samourai/ai/rules/testing-strategy.md (Samourai onboarding incomplete); @test-plan-writer refused PM-provided fallback; @architect can't write rules files -> 3 extra delegations. Run /bootstrap on new repos before first change."
+    type: retro
+    date: "2026-10-06"
+  - text: "Blocking question was resolved by PM decision after user requested end-to-end run; decision logged on ticket"
+    type: resolved
+    date: "2026-10-06"
