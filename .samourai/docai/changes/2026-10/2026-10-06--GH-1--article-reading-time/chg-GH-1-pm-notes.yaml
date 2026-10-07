@@ -12,7 +12,7 @@ phases:
   review_fix: { started: "2026-10-06T15:09:49Z", completed: "2026-10-06T15:26:27Z" }
   quality_gates: { started: "2026-10-06T15:26:27Z", completed: "2026-10-06T15:30:11Z" }
   dod_check: { started: "2026-10-06T15:30:11Z", completed: "2026-10-06T15:30:11Z" }
-  pr_creation: { started: "2026-10-06T15:30:11Z", completed: null, url: null }
+  pr_creation: { started: "2026-10-06T15:30:11Z", completed: "2026-10-06T15:33:00Z", url: "https://github.com/opensourceMS/angular-realworld-example-app/pull/2" }
 decisions:
   - text: >-
       PM-decided (user asked to run full workflow without waiting): option D. Reading time is
